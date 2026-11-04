@@ -40,6 +40,7 @@ describe('RequestService unit tests.', () => {
 
   afterEach(() => {
     vi.clearAllMocks();
+    vi.unstubAllEnvs();
   });
 
   it('should be able to create an instance.', () => {
@@ -58,6 +59,10 @@ describe('RequestService unit tests.', () => {
 
   describe('getEnvVars()', () => {
     it('should not include request specific properties if not set.', () => {
+      // getEnvVars copies process.env, so isolate from proxy/org variables set by the host environment
+      [ENV_HTTP_PROXY, ENV_HTTPS_PROXY, ENV_SF_ORG_INSTANCE_URL, ENV_SF_TARGET_ORG].forEach(name =>
+        vi.stubEnv(name, undefined)
+      );
       const requestService = new RequestService();
       // No properties set
       const envVars = requestService.getEnvVars();
